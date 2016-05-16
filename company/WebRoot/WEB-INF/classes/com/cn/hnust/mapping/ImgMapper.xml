@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.hnust.dao.IImgDao" >
+  <resultMap id="BaseResultMap" type="com.cn.hnust.pojo.Img" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="path" property="path" jdbcType="VARCHAR" />
+    <result column="img_size" property="img_size" jdbcType="VARCHAR" />
+    <result column="create_date" property="create_date" jdbcType="DATE" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="is_index" property="is_index" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, NAME, path,img_size,create_date,remark,is_index
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from t_img
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from t_img
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.cn.hnust.pojo.Img" >
+
+	<selectKey resultType="INTEGER"  order="BEFORE" keyProperty="id">
+    select SEQ_T_IMG.nextval as ID from  DUAL
+  	</selectKey>
+  	
+    insert into t_img
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+       id,
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="path != null" >
+        path,
+      </if>
+      <if test="img_size != null" >
+        img_size,
+      </if>
+      <if test="create_date != null" >
+        create_date,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{id},
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null" >
+        #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="img_size != null" >
+        #{img_size,jdbcType=VARCHAR},
+      </if>
+      <if test="create_date != null" >
+        #{create_date,jdbcType=DATE},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cn.hnust.pojo.Img" >
+    update t_img
+    <set >
+      <if test="name != null" >
+       name= #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="path != null" >
+       path= #{path,jdbcType=VARCHAR},
+      </if>
+      <if test="create_date != null" >
+       create_date= #{create_date,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+       remark= #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="is_index != null" >
+       is_index= #{is_index,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  
+  <select id="findAllCount" resultType="int">
+  	select count(*) from t_img
+  	where 1=1
+  	<if test="id != null" >
+      and ID = #{id,jdbcType=DECIMAL}
+    </if>
+    <if test="name != null" >
+      and name like '%${name}%'
+    </if>
+    <if test="path != null" >
+      and path like '%${path}%' 
+    </if>
+    <if test="img_size != null" >
+      and img_size like '%${img_size}%' 
+    </if>
+    <if test="remark != null" >
+      and remark like '%${remark}%' 
+    </if>
+    <if test="is_index != null" >
+      and is_index =#{is_index,jdbcType=VARCHAR}
+    </if>
+  </select>
+  
+  <!-- 查询 -->
+  <select id="findByParams" resultMap="BaseResultMap" parameterType="map" >
+    select
+     <include refid="Base_Column_List" />
+    from t_img TB
+    where 1=1 
+    <if test="id != null" >
+      and ID = #{id,jdbcType=DECIMAL}
+    </if>
+    <if test="name != null" >
+      and name like '%${name}%'
+    </if>
+    <if test="path != null" >
+      and path like '%${path}%' 
+    </if>
+    <if test="img_size != null" >
+      and img_size like '%${img_size}%' 
+    </if>
+    <if test="remark != null" >
+      and remark like '%${remark}%' 
+    </if>
+    <if test="is_index != null" >
+      and is_index =#{is_index,jdbcType=VARCHAR}
+    </if>
+    order by id desc
+  </select>
+  
+  <select id="findAll" resultMap="BaseResultMap" parameterType="com.cn.hnust.pojo.Img">
+  	select <include refid="Base_Column_List" />
+  	from t_img
+  	where 1=1
+  	<if test="id != null" >
+      and ID = #{id,jdbcType=DECIMAL}
+    </if>
+    <if test="name != null" >
+      and name = #{name,jdbcType=DECIMAL}
+    </if>
+    <if test="path != null" >
+      and path like '%${path}%' 
+    </if>
+    <if test="img_size != null" >
+      and img_size like '%${img_size}%' 
+    </if>
+    <if test="remark != null" >
+      and remark like '%${remark}%' 
+    </if>
+    <if test="is_index != null" >
+      and is_index =#{is_index,jdbcType=VARCHAR}
+    </if>
+    order by id desc
+  </select>
+  
+  <!-- 用于首页的展示图片 -->
+  <select id="findByIndex" resultMap="BaseResultMap" parameterType="com.cn.hnust.pojo.Img">
+	select *
+ 	 from (select my_table.*, rownum my_rownum
+          from (  	
+  	select <include refid="Base_Column_List" />
+  	from t_img
+  	where 1=1
+  	<if test="id != null" >
+      and ID = #{id,jdbcType=DECIMAL}
+    </if>
+    <if test="name != null" >
+      and name = #{name,jdbcType=DECIMAL}
+    </if>
+    <if test="path != null" >
+      and path like '%${path}%' 
+    </if>
+    <if test="img_size != null" >
+      and img_size like '%${img_size}%' 
+    </if>
+    <if test="remark != null" >
+      and remark like '%${remark}%' 
+    </if>
+    <if test="is_index != null" >
+      and is_index =#{is_index,jdbcType=VARCHAR}
+    </if>
+    order by id desc)
+    <![CDATA[ 
+    my_table
+         where rownum <= 6)
+ where my_rownum > 0
+ 	]]>
+  </select>
+  
+</mapper>

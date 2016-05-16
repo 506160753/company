@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cn.hnust.dao.INewsDao" >
+  <resultMap id="BaseResultMap" type="com.cn.hnust.pojo.News" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="create_date" property="create_date" jdbcType="TIMESTAMP" />
+    <result column="img_path" property="img_path" jdbcType="VARCHAR" />
+    <result column="user_id" property="user_id" jdbcType="VARCHAR" />
+    <result column="is_index" property="is_index" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, title, content,create_date,img_path,user_id ,is_index
+  </sql>
+  
+  <sql id="Base_Column_List_substr">
+    ID, title, substr(content,'0','200') as content,create_date,img_path,user_id,is_index
+  </sql>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from news
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from news
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  
+  <insert id="insertSelective" parameterType="com.cn.hnust.pojo.News" >
+    insert into news
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+       id,
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="img_path != null" >
+        img_path,
+      </if>
+      <if test="create_date != null" >
+        create_date,
+      </if>
+      <if test="user_id != null" >
+        user_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      SEQ_T_News.Nextval,
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="img_path != null" >
+        #{img_path,jdbcType=VARCHAR},
+      </if>
+      <if test="create_date != null" >
+        #{create_date},
+      </if>
+      <if test="user_id != null" >
+        #{user_id,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.cn.hnust.pojo.News" >
+    update news
+    <set >
+      <if test="title != null" >
+       title= #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+       content= #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="img_path != null" >
+       img_path= #{img_path,jdbcType=VARCHAR},
+      </if>
+      <if test="create_date != null" >
+       create_date= #{create_date},
+      </if>
+      <if test="user_id != null" >
+       user_id= #{user_id,jdbcType=VARCHAR},
+      </if>
+      <if test="is_index != null" >
+       is_index = #{is_index,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+  
+  <select id="findAllCount" resultType="int" parameterType="map">
+  	select count(*) from news
+  	where 1=1 
+    <if test="id != null" >
+      and ID = #{id,jdbcType=DECIMAL}
+    </if>
+    <if test="title != null" >
+      and title like '%${title}%'
+    </if>
+    <if test="content != null" >
+      and content like '%${content}%' 
+    </if>
+    <if test="user_id != null" >
+      and user_id = #{user_id,jdbcType=VARCHAR} 
+    </if>
+    <if test="is_index != null" >
+      and is_index = #{is_index,jdbcType=VARCHAR} 
+    </if>
+  </select>
+  
+  <!-- 查询 -->
+  <select id="findByParams" resultMap="BaseResultMap" parameterType="map" >
+    select
+     <include refid="Base_Column_List" />
+    from news TB
+    where 1=1 
+    <if test="id != null" >
+      and ID = #{id,jdbcType=DECIMAL}
+    </if>
+    <if test="title != null" >
+      and title like '%${title}%'
+    </if>
+    <if test="content != null" >
+      and content like '%${content}%' 
+    </if>
+    <if test="user_id != null" >
+      and user_id = #{user_id,jdbcType=VARCHAR} 
+    </if>
+    <if test="is_index != null" >
+      and is_index = #{is_index,jdbcType=VARCHAR} 
+    </if>
+    order by id desc
+  </select>
+  
+  <select id="findAll" resultMap="BaseResultMap" parameterType="com.cn.hnust.pojo.News">
+	   <if test="startIndex != null">
+			select * from (select
+			my_table.*, rownum my_rownum from (
+	   </if>
+  	select <include refid="Base_Column_List_substr" />
+  	from news
+  	where 1=1
+  	<if test="id != null" >
+      and ID = #{id,jdbcType=DECIMAL}
+    </if>
+    <if test="title != null" >
+      and title like '%${title}%'
+    </if>
+    <if test="content != null" >
+      and content like '%${content}%' 
+    </if>
+    <if test="user_id != null" >
+      and user_id = #{user_id,jdbcType=VARCHAR} 
+    </if>
+    <if test="is_index != null" >
+      and is_index = #{is_index,jdbcType=VARCHAR} 
+    </if>
+    order by id desc
+   
+   <if test="startIndex != null">
+	    <![CDATA[  
+	   ) my_table where rownum <= #{endIndex} ) where my_rownum > #{startIndex}
+	   ]]>
+   </if>
+  </select>
+  
+  <select id="findHotUser" resultMap="BaseResultMap">
+  	select * from (
+	select my_table.*, rownum my_rownum
+	                    from (
+	select count(ns.user_id) post_user, ns.user_id
+	  from news ns
+	 group by ns.user_id order by post_user desc
+	) my_table
+	 <![CDATA[  
+	 where rownum <= 8) 
+  ]]>
+  </select>
+  
+</mapper>
